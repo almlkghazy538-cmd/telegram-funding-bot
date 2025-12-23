@@ -13,7 +13,7 @@ def setup():
     print("\n2️⃣ إنشاء ملف الإعدادات...")
     if not os.path.exists(".env"):
         with open(".env", "w") as f:
-            f.write("BOT_TOKEN=8436742877:AAHmlmOKY2iQCGoOt004ruq09tZGderDGMQ\n")
+            f.write("BOT_TOKEN=8436742877:AAFLSbZzdssjGodD1CmyOMNdTvAIlcUtmuw\n")
             f.write("ADMIN_ID=6130994941\n")
             f.write("DATABASE_URL=sqlite:///bot_database.db\n")
         print("✅ تم إنشاء ملف .env")
