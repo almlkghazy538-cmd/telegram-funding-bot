@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
-    BOT_TOKEN = os.getenv("BOT_TOKEN", "8436742877:AAHmlmOKY2iQCGoOt004ruq09tZGderDGMQ")
+    BOT_TOKEN = os.getenv("BOT_TOKEN", "8436742877:AAFLSbZzdssjGodD1CmyOMNdTvAIlcUtmuw")
     ADMIN_ID = int(os.getenv("ADMIN_ID", 6130994941))
     DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///bot_database.db")
     
