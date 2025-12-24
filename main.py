@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 async def main():
     """الدالة الرئيسية لتشغيل البوت"""
     # التحقق من التوكن
-    if Config.BOT_TOKEN == "ضع_توكن_البوت_هنا":
+    if Config.BOT_TOKEN == "8436742877:AAGhCfnC9hbW7Sa4gMTroYissoljCjda9Ow":
         print("❌ خطأ: لم تقم بوضع توكن البوت!")
         print("🔧 قم بتعديل ملف config.py أو .env ووضع التوكن الصحيح")
         return
