@@ -1,6 +1,6 @@
-from sqlalchemy import create_engine, Column, Integer, String, Boolean, BigInteger, DateTime, Text, ForeignKey, JSON, Float
+from sqlalchemy import create_engine, Column, Integer, String, Boolean, BigInteger, DateTime, Text, Float
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship
+from sqlalchemy.orm import sessionmaker
 from datetime import datetime
 import json
 
@@ -63,6 +63,27 @@ class FundingRequest(Base):
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
+class PointsTransfer(Base):
+    __tablename__ = 'points_transfers'
+    id = Column(Integer, primary_key=True)
+    from_user_id = Column(BigInteger, nullable=False)
+    to_user_id = Column(BigInteger, nullable=False)
+    amount = Column(Integer, nullable=False)
+    fee_percent = Column(Integer, nullable=False)
+    fee_amount = Column(Integer, nullable=False)
+    net_amount = Column(Integer, nullable=False)
+    transfer_date = Column(DateTime, default=datetime.now)
+
+class SystemSettings(Base):
+    __tablename__ = 'system_settings'
+    id = Column(Integer, primary_key=True)
+    maintenance_mode = Column(Boolean, default=False)
+    maintenance_message = Column(Text, default='البوت تحت الصيانة حالياً')
+    transfer_enabled = Column(Boolean, default=True)
+    transfer_fee_percent = Column(Integer, default=5)
+    updated_by = Column(BigInteger, nullable=True)
+    updated_at = Column(DateTime, default=datetime.now)
+
 class PointsSettings(Base):
     __tablename__ = 'points_settings'
     id = Column(Integer, primary_key=True)
@@ -71,7 +92,7 @@ class PointsSettings(Base):
     daily_gift_points = Column(Integer, default=3)
     points_per_channel = Column(Integer, default=2)
     min_points_for_funding = Column(Integer, default=25)
-    updated_by = Column(BigInteger)
+    updated_by = Column(BigInteger, nullable=True)
     updated_at = Column(DateTime, default=datetime.now)
 
 class AdminContact(Base):
@@ -83,7 +104,50 @@ class AdminContact(Base):
     added_by = Column(BigInteger)
     added_at = Column(DateTime, default=datetime.now)
 
+# إنشاء المحرك والجلسة
 engine = create_engine('sqlite:///bot_database.db', echo=False)
-Base.metadata.create_all(engine)
-Session = sessionmaker(bind=engine)
-session = Session()
+SessionLocal = sessionmaker(bind=engine)
+
+def get_db():
+    """الحصول على جلسة قاعدة البيانات"""
+    db = SessionLocal()
+    try:
+        return db
+    finally:
+        db.close()
+
+def init_database():
+    """تهيئة قاعدة البيانات"""
+    Base.metadata.create_all(engine)
+    db = get_db()
+    
+    try:
+        # إعدادات النظام
+        if db.query(SystemSettings).count() == 0:
+            system_settings = SystemSettings()
+            db.add(system_settings)
+        
+        # إعدادات النقاط
+        if db.query(PointsSettings).count() == 0:
+            points_settings = PointsSettings()
+            db.add(points_settings)
+        
+        # المدير الرئيسي
+        admin_user = db.query(User).filter_by(user_id=6130994941).first()
+        if not admin_user:
+            admin_user = User(
+                user_id=6130994941,
+                username="admin",
+                first_name="مدير النظام",
+                is_admin=True,
+                admin_permissions='["all"]'
+            )
+            db.add(admin_user)
+        
+        db.commit()
+        print("✅ تم تهيئة قاعدة البيانات بنجاح")
+    except Exception as e:
+        print(f"❌ خطأ في تهيئة قاعدة البيانات: {e}")
+        db.rollback()
+    finally:
+        db.close()
