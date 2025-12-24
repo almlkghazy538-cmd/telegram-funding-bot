@@ -1,7 +1,9 @@
-hereimport os
+import os
 import sys
 
 def setup():
+    """إعداد النظام"""
+    print("=" * 50)
     print("🚀 إعداد مشروع بوت تمويل القنوات")
     print("=" * 50)
     
@@ -9,49 +11,45 @@ def setup():
     print("\n1️⃣ تثبيت المكتبات المطلوبة...")
     os.system("pip install -r requirements.txt")
     
-    # 2. نسخ ملف .env
+    # 2. إنشاء ملف .env إذا لم يكن موجوداً
     print("\n2️⃣ إنشاء ملف الإعدادات...")
     if not os.path.exists(".env"):
-        with open(".env", "w") as f:
-            f.write("BOT_TOKEN=8436742877:AAFLSbZzdssjGodD1CmyOMNdTvAIlcUtmuw\n")
+        with open(".env", "w", encoding="utf-8") as f:
+            f.write("BOT_TOKEN=8436742877:AAGhCfnC9hbW7Sa4gMTroYissoljCjda9Ow\n")
             f.write("ADMIN_ID=6130994941\n")
             f.write("DATABASE_URL=sqlite:///bot_database.db\n")
         print("✅ تم إنشاء ملف .env")
+        print("⚠️  تذكر تعديل التوكن في ملف .env")
     else:
         print("✅ ملف .env موجود بالفعل")
     
     # 3. إنشاء قاعدة البيانات
     print("\n3️⃣ إنشاء قاعدة البيانات...")
-    from database import Base, engine
-    Base.metadata.create_all(engine)
-    print("✅ تم إنشاء قاعدة البيانات")
+    try:
+        from database import init_database
+        init_database()
+        print("✅ تم إنشاء قاعدة البيانات")
+    except Exception as e:
+        print(f"❌ خطأ في إنشاء قاعدة البيانات: {e}")
     
-    # 4. تعيين المدير الرئيسي
-    print("\n4️⃣ تعيين المدير الرئيسي...")
-    from database import session, User
+    # 4. التحقق من التوكن
+    print("\n4️⃣ التحقق من التوكن...")
     from config import Config
-    
-    admin = session.query(User).filter_by(user_id=Config.ADMIN_ID).first()
-    if not admin:
-        admin = User(
-            user_id=Config.ADMIN_ID,
-            username="admin",
-            first_name="مدير النظام",
-            is_admin=True,
-            admin_permissions='["all"]'
-        )
-        session.add(admin)
-        session.commit()
-        print(f"✅ تم تعيين المستخدم {Config.ADMIN_ID} كمشرف رئيسي")
+    if Config.BOT_TOKEN == "ضع_توكن_البوت_هنا":
+        print("❌ لم تقم بوضع توكن البوت!")
+        print("📝 قم بتعديل ملف .env ووضع التوكن الصحيح")
+        print("💡 احصل على التوكن من @BotFather")
     else:
-        print("✅ المدير موجود بالفعل")
+        print(f"✅ التوكن مضبوط ({Config.BOT_TOKEN[:10]}...)")
     
     print("\n" + "=" * 50)
     print("✅ تم الإعداد بنجاح!")
     print("\n🔧 الخطوات التالية:")
-    print("1. افتح ملف .env وضع توكن البوت")
+    print("1. افتح ملف .env وضع توكن البوت الصحيح")
     print("2. شغل البوت: python main.py")
-    print("3. ابدأ بإضافة القنوات والمجموعات من لوحة التحكم")
+    print("3. اذهب للبوت في تليجرام وأرسل /start")
+    print("4. من لوحة التحكم، أضف القنوات والمجموعات")
+    print("=" * 50)
 
 if __name__ == "__main__":
     setup()
